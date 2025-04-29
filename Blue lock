@@ -1,0 +1,59 @@
+-- Função para desenhar uma caixa ao redor do jogador
+function DrawBox(player)
+    local playerPos = player.Character.HumanoidRootPart.Position
+    local screenPos, onScreen = game:GetService("Workspace").CurrentCamera:WorldToScreenPoint(playerPos)
+
+    if onScreen then
+        -- Aqui você pode ajustar a cor e o tamanho da caixa conforme sua necessidade
+        local boxSize = 50
+        local topLeft = Vector2.new(screenPos.X - boxSize / 2, screenPos.Y - boxSize / 2)
+        local bottomRight = Vector2.new(screenPos.X + boxSize / 2, screenPos.Y + boxSize / 2)
+
+        -- Desenha a caixa na tela
+        local espBox = Drawing.new("Quad")
+        espBox.Color = Color3.fromRGB(255, 0, 0)
+        espBox.Thickness = 2
+        espBox.Filled = false
+        espBox.Position = topLeft
+        espBox.Size = bottomRight - topLeft
+        espBox.Visible = true
+    end
+end
+
+-- Função para verificar se o jogador está no time correto
+function IsPlayerOnTeam(player, teamName)
+    return player.Team and player.Team.Name == teamName
+end
+
+-- Função para verificar se o jogador está usando um script
+function CheckForSuspiciousActivity(player)
+    -- Aqui você pode adicionar suas próprias verificações
+    -- Exemplo simples: verificar se o jogador está em uma posição muito alta ou muito rápida
+    local humanoid = player.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        if humanoid.Health < 100 then
+            print(player.Name .. " pode estar com um comportamento suspeito.")
+        end
+    end
+end
+
+-- Função principal do script
+function RunESP()
+    -- Verifica todos os jogadores no jogo
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            -- Checa se o jogador está no time correto
+            if IsPlayerOnTeam(player, "YourTeamName") then
+                DrawBox(player)
+            end
+            -- Verifica se há alguma atividade suspeita
+            CheckForSuspiciousActivity(player)
+        end
+    end
+end
+
+-- Loop principal para atualizar o ESP
+while true do
+    RunESP()
+    wait(1)  -- Atualiza a cada 1 segundo
+end
